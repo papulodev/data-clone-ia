@@ -1,12 +1,12 @@
 import { connectDB } from "@/app/lib/db"
 import { Clone } from "@/app/lib/models/Clone"
-import { generarResumenPersonalidad } from "@/app/lib/services/embedding"
+import { generarEmbedding, generarResumenPersonalidad } from "@/app/lib/services/embedding"
 import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
     await connectDB()
-    const clones = await Clone.find({ activo: true }).sort({ creadoEn: -1 })
+    const clones = await Clone.find({ activo: true }).select('-embedding').sort({ creadoEn: -1 })
 
     return NextResponse.json({ ok: true, total: clones.length, clones })
   } catch (error) {
@@ -23,11 +23,12 @@ export async function POST(request: Request) {
     const datos = await request.json()
 
     const resumenPersonalidad = generarResumenPersonalidad(datos)
+    const embedding = await generarEmbedding(datos)
 
     const clon = await Clone.create({
       ...datos,
       resumenPersonalidad,
-      // embedding: await generarEmbedding(resumenPersonalidad)
+      embedding
     })
 
     return NextResponse.json({

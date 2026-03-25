@@ -44,3 +44,30 @@ export async function simular(id: string, escenario: string): Promise<{ ok: bool
   })
   return res.json()
 }
+
+export interface Comparacion {
+  similitud: {
+    porcentaje: number;
+    nivel: string;
+  };
+  clonA: { id: string; nombre: string };
+  clonB: { id: string; nombre: string };
+  analisis: {
+    resumen: string;
+    similitudes: string[];
+    diferencias: string[];
+    recomendacion: string;
+    ganadorDescuentos: string;
+    ganadorTicket: string;
+    ganadorFrecuencia: string;
+  }
+}
+
+export async function compararClones(clonAId: string, clonBId: string): Promise<{ ok: boolean; comparacion?: Comparacion; error?: string }> {
+  const res = await fetch('/api/clones/compare', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clonAId, clonBId })
+  })
+  return res.json()
+}

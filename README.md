@@ -1,18 +1,23 @@
-# 🧬 DataClone AI — Backend
+# 🧬 DataClone AI
 
-API REST para la creación de gemelos digitales inteligentes de clientes. Permite generar perfiles de comportamiento, simular decisiones y chatear con un clon de IA que responde como un cliente real.
+> Gemelos digitales inteligentes de clientes. Creá perfiles de comportamiento, simulá decisiones y chateá con clones de IA que responden como clientes reales.
 
 > Proyecto desarrollado para la **Hackathon CubePath 2026**
 
 ---
 
-## 🚀 ¿Qué hace este proyecto?
+## 🚀 ¿Qué es DataClone AI?
 
-DataClone AI toma datos históricos de un cliente (compras, preferencias, comportamiento) y genera un **clon digital** capaz de:
+DataClone AI es una plataforma que permite crear **gemelos digitales** de tus clientes. Convierte datos históricos (compras, preferencias, comportamiento) en clones inteligentes capaces de:
 
-- Responder preguntas como si fuera ese cliente
-- Simular su reacción ante cambios de precio, nuevos productos o promociones
-- Comparar el comportamiento entre distintos segmentos de clientes
+- 💬 **Chatear** como si fuera el cliente real
+- 🔮 **Simular** reacciones ante cambios de precio, promociones o nuevos productos
+- ⚖️ **Comparar** clones para identificar segmentos similares
+- 📊 **Analizar** comportamiento sin riesgo real
+
+### 🎯 Caso de uso
+
+Subís datos de tus clientes → El sistema genera un clon digital → Podés preguntarle "¿comprarías este producto?" o simular escenarios como "suben precios 20%".
 
 ---
 
@@ -20,39 +25,66 @@ DataClone AI toma datos históricos de un cliente (compras, preferencias, compor
 
 | Tecnología | Uso |
 |---|---|
-| Node.js + Express | Servidor y API REST |
-| MongoDB Atlas + Mongoose | Base de datos de perfiles |
-| Groq API + Llama 3.3 70B | Chat con clones (gratis, sin costo) |
-| dotenv | Variables de entorno |
-| nodemon | Desarrollo con hot reload |
+| Next.js 15 (App Router) | Framework full-stack |
+| TypeScript | Tipado estático |
+| Tailwind CSS + shadcn/ui | Estilos y componentes |
+| MongoDB Atlas + Mongoose | Base de datos |
+| Groq API + Llama 3.3 70B | Chat y simulación (gratis) |
+| Hugging Face + BGE-M3 | Embeddings vectoriales |
 
-> **Nota sobre embeddings:** La versión actual usa prompt engineering para definir la personalidad del clon. 
-> Los embeddings podrían agregarse en una versión futura para mejorar la búsqueda semántica y 
-> similitud entre clones.
+---
+
+## ✨ Features
+
+### Core
+- ✅ Crear clones desde datos de clientes
+- ✅ Chatear con clones usando IA
+- ✅ Simular escenarios de negocio
+- ✅ Comparar clones con embeddings (similitud coseno)
+
+### UI/UX
+- 🌙 Tema oscuro "Nebula" con glassmorphism
+- 📱 Diseño responsivo
+- 🎨 Componentes shadcn/ui
+- ✨ Animaciones suaves
 
 ---
 
 ## 📁 Estructura del proyecto
 
 ```
-dataclone-ai-backend/
-├── src/
-│   ├── app.js                    # Entry point
-│   ├── config/
-│   │   └── db.js                 # Conexión a MongoDB
-│   ├── models/
-│   │   └── Clone.model.js        # Schema del clon
-│   ├── controllers/
-│   │   ├── clone.controller.js   # Lógica de clones
-│   │   └── chat.controller.js    # Lógica del chat
-│   ├── routes/
-│   │   ├── clone.routes.js       # Rutas de clones
-│   │   └── chat.routes.js        # Rutas del chat
-│   ├── services/
-│   │   ├── embedding.service.js  # Resumen de personalidad del clon
-│   │   └── chat.service.js       # Chat con el clon (Groq)
-│   └── mock/
-│       └── clientes.mock.js      # Datos de prueba
+dataclone-ai/
+├── app/
+│   ├── api/                          # API Routes
+│   │   ├── clones/
+│   │   │   ├── route.ts            # GET/POST /api/clones
+│   │   │   ├── [id]/route.ts      # GET /api/clones/:id
+│   │   │   ├── compare/route.ts   # POST /api/clones/compare
+│   │   │   └── mock/route.ts      # POST /api/clones/mock
+│   │   └── chat/
+│   │       └── [id]/
+│   │           ├── route.ts        # POST /api/chat/:id
+│   │           └── simular/route.ts
+│   ├── components/                   # Componentes React
+│   │   ├── Sidebar.tsx
+│   │   ├── ChatView.tsx
+│   │   ├── SimulatorView.tsx
+│   │   ├── CloneProfile.tsx
+│   │   ├── CompareClones.tsx
+│   │   ├── CreateCloneForm.tsx
+│   │   └── ui/                     # shadcn components
+│   ├── lib/
+│   │   ├── api.ts                  # Funciones API client
+│   │   ├── db.ts                   # Conexión MongoDB
+│   │   ├── models/Clone.ts         # Schema Mongoose
+│   │   └── services/
+│   │       ├── embedding.ts        # Hugging Face embeddings
+│   │       ├── groq.ts             # Cliente Groq
+│   │       └── compare.ts          # Comparación de clones
+│   ├── layout.tsx
+│   ├── page.tsx                    # Dashboard principal
+│   └── globals.css                 # Tema Nebula
+├── design/                          # Guías de diseño
 ├── .env.example
 ├── package.json
 └── README.md
@@ -60,142 +92,48 @@ dataclone-ai-backend/
 
 ---
 
-## ⚙️ Instalación y configuración
+## ⚙️ Instalación local
 
-### 1. Clonar el repositorio
+### Requisitos
+- Node.js 18+
+- MongoDB Atlas (o MongoDB local)
+- Cuenta en [Groq](https://console.groq.com) (gratis)
+- Cuenta en [Hugging Face](https://huggingface.co) (gratis)
+
+### Pasos
 
 ```bash
-git clone https://github.com/tu-usuario/dataclone-ai-backend.git
-cd dataclone-ai-backend
-```
+# 1. Clonar repositorio
+git clone https://github.com/tu-usuario/dataclone-ai.git
+cd dataclone-ai
 
-### 2. Instalar dependencias
-
-```bash
+# 2. Instalar dependencias
 npm install
-```
 
-### 3. Configurar variables de entorno
-
-Copiá el archivo de ejemplo y completá tus credenciales:
-
-```bash
+# 3. Configurar variables de entorno
 cp .env.example .env
 ```
 
 Editá el `.env`:
 
 ```env
-MONGO_URI=mongodb+srv://usuario:password@cluster.mongodb.net/dataclone
-GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-PORT=4000
+# MongoDB
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/dataclone
+
+# Groq (gratis) - https://console.groq.com
+GROQ_API_KEY=gsk_...
+
+# Hugging Face (gratis) - https://huggingface.co/settings/tokens
+HF_TOKEN=hf_...
 ```
 
-### 4. Correr en desarrollo
+### Correr en desarrollo
 
 ```bash
 npm run dev
 ```
 
-Deberías ver:
-```
-MongoDB conectado
-Servidor en http://localhost:4000
-```
-
----
-
-## 📡 Endpoints disponibles
-
-### Clones
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| `POST` | `/clones` | Crea un clon desde datos custom |
-| `POST` | `/clones/mock` | Crea clones de prueba automáticamente |
-| `GET` | `/clones` | Lista todos los clones |
-| `GET` | `/clones/:id` | Obtiene un clon por ID |
-
-### Chat
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| `POST` | `/chat/:clonId` | Envía un mensaje al clon |
-
-### Simulación
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| `POST` | `/chat/:clonId/simular` | Simula un escenario para el clon |
-
----
-
-## 🧪 Ejemplo de uso
-
-### Crear un clon custom
-
-```bash
-POST /clones
-Content-Type: application/json
-
-{
-  "nombre": "María García",
-  "edad": 29,
-  "genero": "femenino",
-  "comprasPorMes": 2,
-  "ticketPromedio": 4500,
-  "sensibleDescuentos": true,
-  "categorias": ["ropa", "calzado", "accesorios"],
-  "historial": [
-    "compró zapatillas Nike en enero",
-    "abrió email de 30% off y compró al instante"
-  ]
-}
-```
-
-**Respuesta:**
-```json
-{
-  "ok": true,
-  "mensaje": "Clon creado exitosamente",
-  "clon": {
-    "id": "6622f3a1b4e1c2d3e4f56789",
-    "nombre": "María García",
-    "resumenPersonalidad": "Sos María García, tenés 29 años..."
-  }
-}
-```
-
-### Chatear con el clon
-
-```bash
-POST /chat/6622f3a1b4e1c2d3e4f56789
-Content-Type: application/json
-
-{
-  "mensaje": "¿Me recomendarías este producto si cuesta $5000?"
-}
-```
-
-**Respuesta:**
-```json
-{
-  "ok": true,
-  "clon": { "id": "6622f3a1b4e1c2d3e4f56789", "nombre": "María García" },
-  "respuesta": "Mmm, $5000 es mucha plata para mí... Si fuera algo que realmente necesito y es de buena calidad, capaz lo pienso. Pero si es algo que puedo conseguir más barato en otro lado, mejor espero una oferta."
-}
-```
-
-### Simular un escenario
-
-```bash
-POST /chat/6622f3a1b4e1c2d3e4f56789/simular
-Content-Type: application/json
-
-{
-  "escenario": "suben el precio un 20%"
-}
-```
+Abrí [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -203,12 +141,64 @@ Content-Type: application/json
 
 Este proyecto está desplegado en [CubePath](https://cubepath.com) como parte de la Hackathon 2026.
 
-```bash
-# Build de producción
-npm start
-```
+### Pasos para desplegar
 
-El servidor corre en el puerto definido en `PORT` (por defecto `4000`).
+1. Subí el código a GitHub
+2. Creá un nuevo proyecto en [CubePath](https://cubepath.com)
+3. Conectá el repositorio de GitHub
+4. CubePath detecta automáticamente Next.js
+5. Agregá las variables de entorno:
+   - `MONGODB_URI`
+   - `GROQ_API_KEY`
+   - `HF_TOKEN`
+6. Deploy automático 🚀
+
+### Build commands
+
+- **Build:** `npm run build`
+- **Start:** `npm start`
+
+---
+
+## 📡 API Endpoints
+
+### Clones
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `POST` | `/api/clones` | Crea un clon desde datos custom |
+| `POST` | `/api/clones/mock` | Crea clones de prueba (María, Carlos) |
+| `GET` | `/api/clones` | Lista todos los clones |
+| `GET` | `/api/clones/:id` | Obtiene un clon por ID |
+| `POST` | `/api/clones/compare` | Compara dos clones |
+
+### Chat
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `POST` | `/api/chat/:id` | Envía un mensaje al clon |
+| `POST` | `/api/chat/:id/simular` | Simula un escenario |
+
+---
+
+## 🎨 Diseño - Nebula Theme
+
+El proyecto usa un sistema de diseño llamado **"Nebula Architecture"**:
+
+- **Colores:** Purple (IA), Teal (Digital Twin), Amber (Confidence)
+- **Glassmorphism:** Cards con blur y transparencia
+- **Sin líneas divisorias:** Espacios y cambios de fondo
+- **Tipografía:** Manrope (headings) + Inter (body)
+
+### Ejemplo de uso del tema
+
+```css
+/* Colors */
+--primary: #c5c0ff      /* Purple - AI */
+--secondary: #68dbae    /* Teal - Digital Twin */
+--tertiary: #ffb95d     /* Amber - Confidence */
+--surface: #10131c       /* Dark background */
+```
 
 ---
 
@@ -216,15 +206,30 @@ El servidor corre en el puerto definido en `PORT` (por defecto `4000`).
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
-| `MONGO_URI` | Connection string de MongoDB Atlas | `mongodb+srv://...` |
-| `GROQ_API_KEY` | API Key de Groq (gratis en groq.com) | `gsk_...` |
-| `PORT` | Puerto del servidor | `4000` |
+| `MONGODB_URI` | Connection string de MongoDB Atlas | `mongodb+srv://...` |
+| `GROQ_API_KEY` | API Key de Groq (gratis) | `gsk_...` |
+| `HF_TOKEN` | Token de Hugging Face (gratis) | `hf_...` |
+
+---
+
+## 🏆 Cómo funciona la comparación de clones
+
+1. Al crear un clon, se genera un **embedding** usando el modelo BGE-M3 de Hugging Face
+2. El embedding es un vector de 1024 dimensiones que representa la "personalidad" del cliente
+3. Para comparar dos clones, calculamos la **similitud coseno** entre sus embeddings
+4. El resultado es un porcentaje de 0-100% que indica qué tan similares son
+
+```typescript
+// Ejemplo de cálculo
+const similitud = cosineSimilarity(embeddingA, embeddingB)
+// Resultado: 87%
+```
 
 ---
 
 ## 👤 Autor
 
-Desarrollado con para la **Hackathon CubePath 2026**
+Desarrollado para la **Hackathon CubePath 2026**
 
 ---
 

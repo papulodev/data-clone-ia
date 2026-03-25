@@ -2,10 +2,11 @@ import { connectDB } from "@/app/lib/db"
 import { Clone } from "@/app/lib/models/Clone"
 import { NextResponse } from "next/server"
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
-    const clon = await Clone.findById(params.id)
+    const { id } = await params
+    const clon = await Clone.findById(id).select('-embedding')
 
     if (!clon) {
       return NextResponse.json(

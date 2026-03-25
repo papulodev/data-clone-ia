@@ -3,7 +3,7 @@ import { Clone } from "@/app/lib/models/Clone"
 import { crearChat } from "@/app/lib/services/groq"
 import { NextResponse } from "next/server"
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
     const { mensaje } = await request.json()

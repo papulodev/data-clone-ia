@@ -5,7 +5,7 @@ import { simularEscenario } from '@/app/lib/services/groq'
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB()

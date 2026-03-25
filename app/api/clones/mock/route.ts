@@ -1,6 +1,6 @@
 import { connectDB } from "@/app/lib/db"
 import { Clone } from "@/app/lib/models/Clone"
-import { generarResumenPersonalidad } from "@/app/lib/services/embedding"
+import { generarEmbedding, generarResumenPersonalidad } from "@/app/lib/services/embedding"
 import { NextResponse } from "next/server"
 
 export const clientesMock = [
@@ -43,10 +43,11 @@ export async function POST() {
 
     for (const datos of clientesMock) {
       const resumenPersonalidad = generarResumenPersonalidad(datos)
+      const embedding = await generarEmbedding(datos)
       const clon = await Clone.create({
         ...datos,
         resumenPersonalidad,
-        // embedding: await generarEmbedding(resumenPersonalidad)
+        embedding
       })
       clones.push({ id: clon._id, nombre: clon.nombre })
     }

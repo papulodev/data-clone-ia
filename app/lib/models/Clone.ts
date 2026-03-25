@@ -14,6 +14,9 @@ const cloneSchema = new Schema({
   // Historial resumido (textos descriptivos)
   historial: [String],
 
+  // Vector del embedding generado por BAAI/bge-m3
+  embedding: [Number],
+
   // Texto de personalidad → alimenta el system prompt del chat
   resumenPersonalidad: { type: String },
 
