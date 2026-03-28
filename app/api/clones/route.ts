@@ -2,6 +2,7 @@ import { connectDB } from "@/app/lib/db"
 import { Clone } from "@/app/lib/models/Clone"
 import { generarEmbedding, generarResumenPersonalidad } from "@/app/lib/services/embedding"
 import { NextResponse } from "next/server"
+import { crearClonSchema, sanitizarDatosClon, validarInput } from "@/app/lib/schemas/validation"
 
 export async function GET() {
   try {
@@ -22,11 +23,23 @@ export async function POST(request: Request) {
     await connectDB()
     const datos = await request.json()
 
-    const resumenPersonalidad = generarResumenPersonalidad(datos)
-    const embedding = await generarEmbedding(datos)
+    // Validar datos del cuerpo de la solicitud
+    const validacion = validarInput(crearClonSchema, datos)
+    if (!validacion.success) {
+      return NextResponse.json(
+        { ok: false, error: validacion.error },
+        { status: 400 }
+      )
+    }
+
+    // Sanitizar datos antes de procesar
+    const datosSanitizados = sanitizarDatosClon(validacion.data!)
+
+    const resumenPersonalidad = generarResumenPersonalidad(datosSanitizados)
+    const embedding = await generarEmbedding(datosSanitizados)
 
     const clon = await Clone.create({
-      ...datos,
+      ...datosSanitizados,
       resumenPersonalidad,
       embedding
     })
@@ -36,11 +49,12 @@ export async function POST(request: Request) {
       mensaje: 'Clone creado exitosamente',
       clon: {
         id: clon._id,
-        nombre: clon.name,
+        nombre: clon.nombre,
         resumenPersonalidad: clon.resumenPersonalidad
       }
     })
   } catch (error) {
+    console.error("Error al crear clon:", error)
     return NextResponse.json(
       { ok: false, error: (error as Error).message },
       { status: 500 }
