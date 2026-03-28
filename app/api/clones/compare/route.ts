@@ -1,8 +1,8 @@
-import { Clone } from "@/app/lib/models/Clone"
-import { compararClones } from "@/app/lib/services/compare"
+import { Clone } from "@/lib/models/Clone"
+import { compararClones } from "@/lib/services/compare"
 import { NextResponse } from "next/server"
 import { connectDB } from "@/app/lib/db"
-import { compararClonesSchema, validarInput } from "@/app/lib/schemas/validation"
+import { compararClonesSchema, validarInput } from "@/lib/schemas/validation"
 
 export const POST = async (req: Request) => {
   try {
@@ -32,7 +32,7 @@ export const POST = async (req: Request) => {
         { status: 404 }
       )
     }
-    
+
     if (!clonB) {
       return NextResponse.json(
         { ok: false, error: "Clon B no encontrado" },

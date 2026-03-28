@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { connectDB } from '@/app/lib/db'
-import { Clone } from '@/app/lib/models/Clone'
-import { simularEscenario } from '@/app/lib/services/groq'
-import { simularEscenarioSchema, sanitizarEscenario, validarInput } from '@/app/lib/schemas/validation'
+import { Clone } from '@/lib/models/Clone'
+import { simularEscenario } from '@/lib/services/groq'
+import { simularEscenarioSchema, sanitizarEscenario, validarInput } from '@/lib/schemas/validation'
 import mongoose from 'mongoose'
 
 export async function POST(
@@ -35,7 +35,7 @@ export async function POST(
     const escenarioSanitizado = sanitizarEscenario(validacion.data!).escenario
 
     const clon = await Clone.findById(id)
-    
+
     if (!clon) {
       return NextResponse.json(
         { ok: false, error: 'Clone no encontrado' },
@@ -52,7 +52,7 @@ export async function POST(
     }
 
     const resultado = await simularEscenario(clon, escenarioSanitizado)
-    
+
     return NextResponse.json({
       ok: true,
       clon: { id: clon._id, nombre: clon.nombre },

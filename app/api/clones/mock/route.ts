@@ -1,6 +1,6 @@
 import { connectDB } from "@/app/lib/db"
-import { Clone } from "@/app/lib/models/Clone"
-import { generarEmbedding, generarResumenPersonalidad } from "@/app/lib/services/embedding"
+import { Clone } from "@/lib/models/Clone"
+import { generarEmbedding, generarResumenPersonalidad } from "@/lib/services/embedding"
 import { NextResponse } from "next/server"
 
 export const clientesMock = [

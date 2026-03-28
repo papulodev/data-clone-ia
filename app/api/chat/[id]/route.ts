@@ -1,14 +1,14 @@
 import { connectDB } from "@/app/lib/db"
-import { Clone } from "@/app/lib/models/Clone"
-import { crearChat } from "@/app/lib/services/groq"
+import { Clone } from "@/lib/models/Clone"
+import { crearChat } from "@/lib/services/groq"
 import { NextResponse } from "next/server"
-import { mensajeSchema, sanitizarMensaje, validarInput } from "@/app/lib/schemas/validation"
+import { mensajeSchema, sanitizarMensaje, validarInput } from "@/lib/schemas/validation"
 import mongoose from "mongoose"
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
-    
+
     const body = await request.json()
     const { id } = await params
 

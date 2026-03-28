@@ -1,8 +1,8 @@
 import { connectDB } from "@/app/lib/db"
-import { Clone } from "@/app/lib/models/Clone"
-import { generarEmbedding, generarResumenPersonalidad } from "@/app/lib/services/embedding"
+import { Clone } from "@/lib/models/Clone"
+import { generarEmbedding, generarResumenPersonalidad } from "@/lib/services/embedding"
 import { NextResponse } from "next/server"
-import { crearClonSchema, sanitizarDatosClon, validarInput } from "@/app/lib/schemas/validation"
+import { crearClonSchema, sanitizarDatosClon, validarInput } from "@/lib/schemas/validation"
 
 export async function GET() {
   try {

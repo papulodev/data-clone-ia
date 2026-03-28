@@ -1,5 +1,5 @@
 import { connectDB } from "@/app/lib/db"
-import { Clone } from "@/app/lib/models/Clone"
+import { Clone } from "@/lib/models/Clone"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
