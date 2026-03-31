@@ -26,15 +26,18 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copy built artifacts
 COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/public ./public
 
 # Set environment
-USER nextjs
 ENV NODE_ENV=production
+ENV PATH=/app/node_modules/.bin:$PATH
+
+USER nextjs
 
 # Expose port
 EXPOSE 3000
 
 # Start
-CMD ["npm", "start"]
+CMD ["node", "node_modules/next/dist/bin/next"]
