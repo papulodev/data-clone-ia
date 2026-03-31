@@ -56,6 +56,10 @@ Subís datos de tus clientes → El sistema genera un clon digital → Podés pr
 dataclone-ai/
 ├── app/
 │   ├── api/                          # API Routes
+│   │   ├── auth/
+│   │   │   ├── route.ts            # GET/POST /api/auth
+│   │   │   ├── register/
+│   │   │   │   └── route.ts        # GET/POST /api/auth/register
 │   │   ├── clones/
 │   │   │   ├── route.ts            # GET/POST /api/clones
 │   │   │   ├── [id]/route.ts      # GET /api/clones/:id
@@ -66,12 +70,13 @@ dataclone-ai/
 │   │           ├── route.ts        # POST /api/chat/:id
 │   │           └── simular/route.ts
 │   ├── components/                   # Componentes React
-│   │   ├── Sidebar.tsx
 │   │   ├── ChatView.tsx
-│   │   ├── SimulatorView.tsx
+│   │   ├── CloneCard.tsx
 │   │   ├── CloneProfile.tsx
 │   │   ├── CompareClones.tsx
 │   │   ├── CreateCloneForm.tsx
+│   │   ├── SidebarApp.tsx
+│   │   ├── SimulatorView.tsx
 │   │   └── ui/                     # shadcn components
 │   ├── lib/
 │   │   ├── api.ts                  # Funciones API client
