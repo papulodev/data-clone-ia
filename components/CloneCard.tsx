@@ -1,5 +1,5 @@
 'use client'
-import { Clone } from '@/app/lib/api'
+import { Clone } from '@/lib/api'
 interface Props {
   clon: Clone
   onSelect: (clon: Clone) => void
@@ -15,7 +15,7 @@ export default function CloneCard({ clon, onSelect, selected }: Props) {
         }`}
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+        <div>
           {clon.nombre.charAt(0)}
         </div>
         <div>

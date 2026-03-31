@@ -1,140 +1,250 @@
-'use client'
-import { useState } from 'react'
-import { crearClon } from '@/app/lib/api'
-interface Props {
-  onCreated: () => void
-}
-export default function CreateCloneForm({ onCreated }: Props) {
-  const [form, setForm] = useState({
-    nombre: '',
-    edad: 25,
-    genero: 'masculino' as 'masculino' | 'femenino' | 'otro',
-    comprasPorMes: 1,
-    ticketPromedio: 5000,
-    sensibleDescuentos: false,
-    categorias: '',
-    historial: ''
-  })
-  const [cargando, setCargando] = useState(false)
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setCargando(true)
-    const datos = {
-      ...form,
-      categorias: form.categorias.split(',').map((c) => c.trim()).filter(Boolean),
-      historial: form.historial.split('\n').filter((h) => h.trim())
+'use client';
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { crearClon } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel, FieldError } from "./ui/field";
+import { Input } from "./ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Checkbox } from "./ui/checkbox";
+import { Textarea } from "./ui/textarea";
+import { Spinner } from "./ui/spinner";
+import { toast } from "sonner";
+import { Dna } from "lucide-react";
+import { CloneFormData, cloneSchema } from "@/lib/schemas/clone";
+
+export function CreateCloneForm() {
+  const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+  } = useForm<CloneFormData>({
+    defaultValues: {
+      nombre: "",
+      edad: 30,
+      genero: "masculino",
+      comprasPorMes: 2,
+      ticketPromedio: 5000,
+      sensibleADescuentos: false,
+      categorias: "",
+      historial: "",
+    },
+  });
+
+  // Watch para checkbox
+  const sensibleADescuentos = watch("sensibleADescuentos");
+
+  const validateForm = (data: CloneFormData): boolean => {
+    const result = cloneSchema.safeParse(data);
+
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string;
+        if (!errors[field]) {
+          errors[field] = issue.message;
+        }
+      });
+      setValidationErrors(errors);
+      return false;
     }
+
+    setValidationErrors({});
+    return true;
+  };
+
+  const onSubmit = async (data: CloneFormData) => {
+    // Validar con Zod antes de enviar
+    if (!validateForm(data)) {
+      toast.error("Por favor, corregí los errores del formulario");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      await crearClon(datos)
-      onCreated()
-      setForm({
-        nombre: '',
-        edad: 25,
-        genero: 'masculino',
-        comprasPorMes: 1,
-        ticketPromedio: 5000,
-        sensibleDescuentos: false,
-        categorias: '',
-        historial: ''
-      })
+      const response = await crearClon({
+        nombre: data.nombre,
+        edad: data.edad,
+        genero: data.genero,
+        comprasPorMes: data.comprasPorMes,
+        ticketPromedio: data.ticketPromedio,
+        sensibleDescuentos: data.sensibleADescuentos,
+        categorias: data.categorias
+          ?.split(",")
+          .map((c) => c.trim())
+          .filter(Boolean) || [],
+        historial: data.historial
+          ?.split("\n")
+          .filter((h) => h.trim()) || [],
+      });
+
+      if (response.ok && response.clon) {
+        toast.success('Clon creado exitosamente.');
+        console.log("Clon creado exitosamente: ", response.clon);
+        reset(); // Resetear formulario
+      } else {
+        toast.error('Ups, hubo un error al crear el clon.');
+      }
     } catch (error) {
-      console.error(error)
+      toast.error('Ups, hubo un error. Intentá de nuevo.');
+      console.error("Error al crear el clon: ", error);
+    } finally {
+      setLoading(false);
     }
-    setCargando(false)
-  }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium">Nombre</label>
-        <input
-          type="text"
-          value={form.nombre}
-          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-          className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-          required
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium">Edad</label>
-          <input
-            type="number"
-            value={form.edad}
-            onChange={(e) => setForm({ ...form, edad: Number(e.target.value) })}
-            className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-          />
+    <div className="flex items-center justify-center">
+      <div className="w-full max-w-2xl">
+        {/* Form */}
+        <div className="glass-panel border border-white/10 rounded-2xl p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Nombre */}
+            <Field>
+              <FieldLabel className="text-muted-foreground">
+                Nombre completo *
+              </FieldLabel>
+              <Input
+                type="text"
+                {...register("nombre")}
+                placeholder="Ej: Juan Pérez"
+                className={`bg-surface-container-low border-white/10 focus:border-primary ${validationErrors.nombre ? "border-destructive focus:border-destructive" : ""}`}
+              />
+              {validationErrors.nombre && (
+                <FieldError>{validationErrors.nombre}</FieldError>
+              )}
+            </Field>
+
+            {/* Edad y Género */}
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel className="text-muted-foreground">
+                  Edad *
+                </FieldLabel>
+                <Input
+                  type="number"
+                  {...register("edad", { valueAsNumber: true })}
+                  className={`bg-surface-container-low border-white/10 focus:border-primary ${validationErrors.edad ? "border-destructive focus:border-destructive" : ""}`}
+                />
+                {validationErrors.edad && (
+                  <FieldError>{validationErrors.edad}</FieldError>
+                )}
+              </Field>
+              <Field>
+                <FieldLabel className="text-muted-foreground">
+                  Género *
+                </FieldLabel>
+                <Select
+                  value={watch("genero")}
+                  onValueChange={(value: "masculino" | "femenino" | "otro") => setValue("genero", value)}
+                >
+                  <SelectTrigger className={`bg-surface-container-low border-white/10 focus:border-primary ${validationErrors.genero ? "border-destructive focus:border-destructive" : ""}`}>
+                    <SelectValue placeholder="Seleccionar género" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-surface-container border-white/10">
+                    <SelectGroup>
+                      <SelectItem value="masculino" className="focus:bg-surface-container-high focus:text-on-surface">Masculino</SelectItem>
+                      <SelectItem value="femenino" className="focus:bg-surface-container-high focus:text-on-surface">Femenino</SelectItem>
+                      <SelectItem value="otro" className="focus:bg-surface-container-high focus:text-on-surface">Otro</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                {validationErrors.genero && (
+                  <FieldError>{validationErrors.genero}</FieldError>
+                )}
+              </Field>
+            </div>
+
+            {/* Compras y Ticket */}
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel className="text-muted-foreground">
+                  Compras por mes *
+                </FieldLabel>
+                <Input
+                  type="number"
+                  {...register("comprasPorMes", { valueAsNumber: true })}
+                  className={`bg-surface-container-low border-white/10 focus:border-primary ${validationErrors.comprasPorMes ? "border-destructive focus:border-destructive" : ""}`}
+                />
+                {validationErrors.comprasPorMes && (
+                  <FieldError>{validationErrors.comprasPorMes}</FieldError>
+                )}
+              </Field>
+              <Field>
+                <FieldLabel className="text-muted-foreground">
+                  Ticket promedio ($) *
+                </FieldLabel>
+                <Input
+                  type="number"
+                  {...register("ticketPromedio", { valueAsNumber: true })}
+                  className={`bg-surface-container-low border-white/10 focus:border-primary ${validationErrors.ticketPromedio ? "border-destructive focus:border-destructive" : ""}`}
+                />
+                {validationErrors.ticketPromedio && (
+                  <FieldError>{validationErrors.ticketPromedio}</FieldError>
+                )}
+              </Field>
+            </div>
+
+            {/* Sensible a descuentos */}
+            <Field orientation="horizontal" className="flex items-center gap-3">
+              <Checkbox
+                id="descuentos"
+                checked={sensibleADescuentos}
+                onCheckedChange={(e) => setValue("sensibleADescuentos", !!e.valueOf())}
+                className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              />
+              <FieldLabel
+                htmlFor="descuentos"
+                className="text-muted-foreground mb-0"
+              >
+                Sensible a descuentos y promociones
+              </FieldLabel>
+            </Field>
+
+            {/* Categorías */}
+            <Field>
+              <FieldLabel className="text-muted-foreground">
+                Categorías de interés
+              </FieldLabel>
+              <Input
+                type="text"
+                {...register("categorias")}
+                placeholder="Ej: tecnología, ropa, electrónica (separadas por coma)"
+                className="bg-surface-container-low border-white/10 focus:border-primary"
+              />
+            </Field>
+
+            {/* Historial */}
+            <Field>
+              <FieldLabel className="text-muted-foreground">
+                Historial de comportamiento
+              </FieldLabel>
+              <Textarea
+                {...register("historial")}
+                placeholder="Ej: Compró zapatillas en enero&#10;Abandonó carrito de $5000&#10;Volvió con descuento"
+                rows={4}
+                className="bg-surface-container-low border-white/10 focus:border-primary resize-none"
+              />
+            </Field>
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-linear-to-r from-primary to-primary-container hover:opacity-90 py-6 text-lg rounded-xl"
+            >
+              {loading ? <><Spinner className="mr-2" /> Creando...</> : <><Dna className="w-5 h-5 mr-2" /> Crear Clon</>}
+            </Button>
+          </form>
         </div>
-        <div>
-          <label className="block text-sm font-medium">Género</label>
-          <select
-            value={form.genero}
-            onChange={(e) => setForm({ ...form, genero: e.target.value as typeof form.genero })}
-            className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-          >
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
-            <option value="otro">Otro</option>
-          </select>
-        </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium">Compras por mes</label>
-          <input
-            type="number"
-            value={form.comprasPorMes}
-            onChange={(e) => setForm({ ...form, comprasPorMes: Number(e.target.value) })}
-            className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Ticket promedio ($)</label>
-          <input
-            type="number"
-            value={form.ticketPromedio}
-            onChange={(e) => setForm({ ...form, ticketPromedio: Number(e.target.value) })}
-            className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-          />
-        </div>
-      </div>
-      <div>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={form.sensibleDescuentos}
-            onChange={(e) => setForm({ ...form, sensibleDescuentos: e.target.checked })}
-          />
-          <span className="text-sm font-medium">Sensible a descuentos</span>
-        </label>
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Categorías (separadas por coma)</label>
-        <input
-          type="text"
-          value={form.categorias}
-          onChange={(e) => setForm({ ...form, categorias: e.target.value })}
-          placeholder="ropa, electrónica, hogar"
-          className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Historial (una línea por evento)</label>
-        <textarea
-          value={form.historial}
-          onChange={(e) => setForm({ ...form, historial: e.target.value })}
-          placeholder="Compró zapatillas en enero
-Abandonó carrito de $5000"
-          rows={3}
-          className="w-full mt-1 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={cargando}
-        className="w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
-      >
-        {cargando ? 'Creando...' : 'Crear Clon'}
-      </button>
-    </form>
-  )
+    </div>
+  );
 }
