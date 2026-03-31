@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source
 COPY . .
@@ -28,7 +28,6 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.env* ./.env 2>/dev/null || true
 
 # Set environment
 USER nextjs
