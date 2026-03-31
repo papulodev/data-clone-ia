@@ -10,7 +10,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupConte
 import OpenCreateClone from "./buttons/OpenCreateClone";
 import OpenCompareClone from "./buttons/OpenCompareClone";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useCloneStore } from "@/store/useCloneStore";
 import { LogOut } from "lucide-react";
@@ -19,11 +19,14 @@ export function SidebarApp() {
   const pathname = usePathname();
   const clones = useCloneStore((state) => state.clones);
   const { data: session } = useSession();
+  const router = useRouter();
 
   const currentCloneId = pathname.startsWith('/clones/') ? pathname.split('/')[2] : null;
 
   const handleLogout = async () => {
-    await signOut();
+    const response = await signOut();
+    console.log(response);
+    router.push('/login');
   }
 
   return (

@@ -5,6 +5,7 @@ import { Clone, simular as simularApi } from "@/lib/api";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Sparkles, TrendingUp, Percent, ShoppingCart, Truck, Gift } from "lucide-react";
+import Link from "next/link";
 
 interface SimulatorViewProps {
   clone: Clone;
@@ -64,12 +65,15 @@ export function SimulatorView({ clone, onBack }: SimulatorViewProps) {
     <div className="flex-1 flex h-full">
       {/* Sidebar */}
       <div className="w-72 bg-surface/60 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col h-full">
-        <button
-          onClick={onBack}
-          className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 transition-all mb-6 self-start"
+        <Button
+          variant="outline"
+          className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+          asChild
         >
-          <ArrowLeft className="w-5 h-5 text-primary" />
-        </button>
+          <Link href={`/dashboard/clones/${clone._id}`}>
+            <ArrowLeft className="w-5 h-5 text-primary" />
+          </Link>
+        </Button>
 
         <div className="text-center mb-6">
           <div className="relative">
