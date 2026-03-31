@@ -123,7 +123,7 @@ Editá el `.env`:
 
 ```env
 # MongoDB
-MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/dataclone
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/nameyourdb
 
 # Groq (gratis) - https://console.groq.com
 GROQ_API_KEY=gsk_...
