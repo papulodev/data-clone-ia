@@ -1,9 +1,15 @@
 import NextAuth from "next-auth"
 import { User } from "./lib/models/User"
 import { comparePassword } from "./lib/auth-utils"
+import { connectDB } from "./app/lib/db"
 import Credentials from "next-auth/providers/credentials"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  callbacks: {
+    authorized: async ({ auth }) => {
+      return !!auth
+    }
+  },
   providers: [
     Credentials({
       name: "credentials",
@@ -15,6 +21,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null
         }
+
+        // Conectar a MongoDB antes de hacer queries
+        await connectDB()
 
         const user = await User.findOne({ email: credentials.email as string })
 
