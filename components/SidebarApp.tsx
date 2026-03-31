@@ -22,6 +22,10 @@ export function SidebarApp() {
 
   const currentCloneId = pathname.startsWith('/clones/') ? pathname.split('/')[2] : null;
 
+  const handleLogout = async () => {
+    await signOut();
+  }
+
   return (
     <Sidebar className="bg-sidebar border-r border-white/5">
       <SidebarHeader className="p-4 bg-transparent">
@@ -100,7 +104,7 @@ export function SidebarApp() {
           <Button
             variant="secondary"
             size="lg"
-            onClick={() => signOut()}
+            onClick={handleLogout}
             className="w-full cursor-pointer"
           >
             <LogOut />
