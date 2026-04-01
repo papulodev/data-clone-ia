@@ -40,6 +40,7 @@ function RegisterForm() {
       const sanitizedData = {
         email: sanitizeEmail(data.email),
         password: sanitizeString(data.password),
+        confirmPassword: sanitizeString(data.confirmPassword),
       }
 
       const response = await fetch("/api/auth/register", {
