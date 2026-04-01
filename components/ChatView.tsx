@@ -5,8 +5,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Clone, chatear } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Send, MessageCircle } from "lucide-react";
+import { ArrowLeft, Send, MessageCircle, Bot, User } from "lucide-react";
 import { Input } from "./ui/input";
+import Link from "next/link";
+import { Field, FieldDescription } from "./ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
 
 // Schema de validación para el mensaje
 const messageSchema = z.object({
@@ -17,7 +20,6 @@ type MessageFormData = z.infer<typeof messageSchema>;
 
 interface ChatViewProps {
   clone: Clone;
-  onBack: () => void;
 }
 
 interface Message {
@@ -25,7 +27,7 @@ interface Message {
   content: string;
 }
 
-export function ChatView({ clone, onBack }: ChatViewProps) {
+export function ChatView({ clone }: ChatViewProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ia",
@@ -116,22 +118,25 @@ export function ChatView({ clone, onBack }: ChatViewProps) {
   };
 
   return (
-    <main className="p-10 h-[calc(100vh-4rem)] flex gap-8 flex-1">
+    <main className="flex-1 h-full flex flex-col lg:flex-row gap-8 p-4 md:p-8">
       {/* Sidebar Info */}
-      <section className="w-80 flex flex-col gap-6">
-        <div className="glass-panel ghost-border p-8 rounded-xl flex flex-col items-center text-center relative overflow-hidden">
+      <section className="w-full lg:w-80 flex gap-6">
+        <div className="glass-panel ghost-border p-8 rounded-xl flex flex-col items-center text-center relative overflow-hidden w-full">
           <Button
             variant="outline"
-            onClick={onBack}
-            className="absolute top-4 left-4 border-white/20 hover:bg-white/10"
+            className="w-10 h-10 rounded-xl flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-all self-start"
+            asChild
           >
-            <ArrowLeft className="w-4 h-4" />
+            <Link href={`/dashboard/clones/${clone._id}`}>
+              <ArrowLeft className="w-5 h-5 text-tertiary" />
+            </Link>
           </Button>
 
           <div className="relative mt-4">
-            <div className="absolute inset-0 bg-secondary/20 blur-2xl rounded-full animate-pulse"></div>
-            <div className="twin-avatar w-20 h-20 flex items-center justify-center bg-surface-container rounded-full animate-pulse-glow relative">
-              <span className="text-2xl font-bold text-on-primary-fixed">
+            <div className="absolute inset-0 bg-secondary blur-2xl rounded-full animate-pulse"></div>
+            <div
+              className="w-12 h-12 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-surface-container-high p-0.5 shadow-lg shadow-secondary animate-pulse-glow">
+              <span className="text-2xl md:text-3xl font-manrope font-black text-secondary tracking-tighter">
                 {clone.nombre.charAt(0)}
               </span>
             </div>
@@ -143,21 +148,21 @@ export function ChatView({ clone, onBack }: ChatViewProps) {
           </p>
 
           <div className="w-full space-y-3 mt-6">
-            <div className="glass-panel border border-white/10 p-3 rounded-xl">
-              <p className="text-xs text-muted-foreground">Ticket promedio</p>
-              <p className="font-semibold text-on-surface">
+            <div className="glass-panel border p-3 rounded-xl">
+              <p className="text-md text-muted-foreground">Ticket promedio</p>
+              <p className="text-md lg:text-lg font-semibold text-secondary">
                 ${clone.ticketPromedio.toLocaleString()}
               </p>
             </div>
-            <div className="glass-panel border border-white/10 p-3 rounded-xl">
-              <p className="text-xs text-muted-foreground">Compras/mes</p>
-              <p className="font-semibold text-on-surface">
+            <div className="glass-panel border p-3 rounded-xl">
+              <p className="text-md text-muted-foreground">Compras/mes</p>
+              <p className="text-md lg:text-lg font-semibold text-on-surface">
                 {clone.comprasPorMes}
               </p>
             </div>
-            <div className="glass-panel border border-white/10 p-3 rounded-xl">
-              <p className="text-xs text-muted-foreground">Descuentos</p>
-              <p className="font-semibold text-on-surface">
+            <div className="glass-panel border p-3 rounded-xl">
+              <p className="text-md text-muted-foreground">Descuentos</p>
+              <p className="text-md lg:text-lg font-semibold text-tertiary">
                 {clone.sensibleDescuentos ? "Sensible" : "Indiferente"}
               </p>
             </div>
@@ -170,29 +175,41 @@ export function ChatView({ clone, onBack }: ChatViewProps) {
       </section>
 
       {/* Chat Area */}
-      <section className="flex-1 flex flex-col h-full">
+      <section className="flex-1 glass-panel ghost-border flex flex-col rounded-xl overflow-hidden h-full">
         {/* Header */}
-        <div className="pb-4 border-b border-white/5">
+        <div className="p-6 pb-4 border-b border-white/5 shrink-0 bg-surface/50 backdrop-blur-sm">
           <h1 className="font-manrope font-bold text-xl text-on-surface flex items-center gap-3">
-            <MessageCircle className="w-5 h-5 text-primary" />
+            <MessageCircle className="w-5 h-5 text-tertiary" />
             Chat con {clone.nombre.split(" ")[0]}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-md text-muted-foreground mt-1">
             Conversá con el clon como si fuera un cliente real
           </p>
         </div>
 
         {/* Messages - grow and scroll */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+        <div className="overflow-y-auto p-6 space-y-4 scroll-auto h-[680px]">
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex gap-2 items-start ${msg.role === "user" ? "flex-row-reverse self-end" : "justify-start"}`}
             >
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container-high p-0.5 border border-tertiary">
+                  <span className="text-xl font-manrope font-black text-secondary tracking-tighter">
+                    {msg.role === "user" ? (
+                      <User className="w-5 h-5 text-tertiary" />
+                    ) : (
+                      <Bot className="w-5 h-5 text-tertiary" />
+                    )}
+                  </span>
+                </div>
+              </div>
               <div
                 className={`max-w-[75%] rounded-2xl px-5 py-3 ${msg.role === "user"
-                    ? "bg-gradient-to-br from-primary to-primary-container text-on-primary font-medium"
-                    : "glass-panel border border-white/10 text-on-surface"
+                  ? "bg-linear-to-br from-primary to-primary-container text-on-primary font-medium"
+                  : "glass-panel border border-white/10 text-on-surface"
                   }`}
               >
                 {msg.content}
@@ -215,53 +232,57 @@ export function ChatView({ clone, onBack }: ChatViewProps) {
         </div>
 
         {/* Quick Questions */}
-        <div className="px-4 pb-3">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="px-4">
+          <div className="flex gap-2 overflow-x-auto pt-2">
             {quickQuestions.map((q) => (
-              <button
+              <Button
                 key={q}
                 onClick={() => sendQuickQuestion(q)}
                 disabled={loading}
                 className="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-high text-muted-foreground text-sm hover:bg-surface-container-highest hover:text-on-surface transition-all disabled:opacity-50 cursor-pointer"
               >
                 {q}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-4 pt-0 bg-surface/80 backdrop-blur-xl border-t border-white/5">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 pb-4 border-b border-white/5 shrink-0 bg-surface/50 backdrop-blur-sm">
           <div className="flex gap-3">
-            <div className="flex-1">
-              <Input
-                {...register("mensaje")}
-                placeholder="Escribí tu pregunta..."
-                disabled={loading}
-                className={`bg-surface-container-low border-white/10 focus:border-secondary ${inputError ? "border-destructive focus:border-destructive" : ""}`}
-                onChange={(e) => {
-                  // Limpiar error cuando el usuario empieza a escribir
-                  if (inputError) setInputError("");
-                  e.target.value = e.target.value;
-                }}
-              />
-              {(errors.mensaje || inputError) && (
-                <p className="text-destructive text-xs mt-1">
-                  {errors.mensaje?.message || inputError}
-                </p>
-              )}
-            </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="px-6 rounded-xl bg-gradient-to-r from-primary to-primary-container hover:opacity-90 transition-opacity"
-            >
-              {loading ? (
-                <span className="animate-spin">...</span>
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </Button>
+            <Field className="flex-1">
+              <InputGroup className="h-14 bg-surface-container rounded-xl border-white/10">
+                <InputGroupInput
+                  {...register("mensaje")}
+                  placeholder="Escribí tu pregunta..."
+                  disabled={loading}
+                  className={`focus:border-secondary ${inputError ? "border-destructive focus:border-destructive" : ""}`}
+                  onChange={(e) => {
+                    // Limpiar error cuando el usuario empieza a escribir
+                    if (inputError) setInputError("");
+                    e.target.value = e.target.value;
+                  }}
+                />
+                <InputGroupAddon align="inline-end">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="h-12 w-12 rounded-xl bg-secondary hover:opacity-90 transition-opacity cursor-pointer"
+                  >
+                    {loading ? (
+                      <span className="animate-spin">...</span>
+                    ) : (
+                      <Send />
+                    )}
+                  </Button>
+                </InputGroupAddon>
+              </InputGroup>
+              <FieldDescription className="text-destructive text-xs mt-1">
+                {(errors.mensaje || inputError) && (
+                  errors.mensaje?.message || inputError
+                )}
+              </FieldDescription>
+            </Field>
           </div>
         </form>
       </section>

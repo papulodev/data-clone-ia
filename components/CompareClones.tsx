@@ -147,9 +147,9 @@ export function CompareClones({ clones }: CompareClonesProps) {
         <Button
           type="submit"
           disabled={loading || !clonAId || !clonBId}
-          className="w-full bg-gradient-to-r from-primary to-primary-container hover:opacity-90"
+          className="w-full bg-linear-to-r from-primary to-primary-container hover:opacity-90 cursor-pointer h-10 text-md"
         >
-          {loading ? <><Spinner className="mr-2" /> Comparando...</> : <><Scale className="w-4 h-4 mr-2" /> Comparar</>}
+          {loading ? <><Spinner className="mr-2" /> Comparando...</> : <><Scale className="w-4 h-4" /> Comparar</>}
         </Button>
 
         {submitError && (

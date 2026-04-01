@@ -9,7 +9,6 @@ import Link from "next/link";
 
 interface SimulatorViewProps {
   clone: Clone;
-  onBack: () => void;
 }
 
 interface SimulationResult {
@@ -19,7 +18,7 @@ interface SimulationResult {
   timestamp: Date;
 }
 
-export function SimulatorView({ clone, onBack }: SimulatorViewProps) {
+export function SimulatorView({ clone }: SimulatorViewProps) {
   const [escenario, setEscenario] = useState("");
   const [loading, setLoading] = useState(false);
   const [historial, setHistorial] = useState<SimulationResult[]>([]);
@@ -62,76 +61,79 @@ export function SimulatorView({ clone, onBack }: SimulatorViewProps) {
   };
 
   return (
-    <div className="flex-1 flex h-full">
-      {/* Sidebar */}
-      <div className="w-72 bg-surface/60 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col h-full">
-        <Button
-          variant="outline"
-          className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-          asChild
-        >
-          <Link href={`/dashboard/clones/${clone._id}`}>
-            <ArrowLeft className="w-5 h-5 text-primary" />
-          </Link>
-        </Button>
+    <main className="flex-1 h-full flex flex-col lg:flex-row gap-8 p-4 md:p-8">
+      <section className="w-full lg:w-80 flex gap-6">
+        <div className="glass-panel ghost-border p-8 rounded-xl flex flex-col items-center text-center relative overflow-hidden w-full">
+          <Button
+            variant="outline"
+            className="w-10 h-10 rounded-xl flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 border border-tertiary/10 transition-all self-start"
+            asChild
+          >
+            <Link href={`/dashboard/clones/${clone._id}`}>
+              <ArrowLeft className="w-5 h-5 text-tertiary" />
+            </Link>
+          </Button>
 
-        <div className="text-center mb-6">
-          <div className="relative">
-            <div className="absolute inset-0 bg-secondary/20 blur-2xl rounded-full animate-pulse"></div>
-            <div className="twin-avatar w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-surface-container rounded-full animate-pulse-glow">
-              <span className="text-2xl font-bold text-on-primary-fixed">
+          <div className="relative mt-4">
+            <div className="absolute inset-0 bg-secondary blur-2xl rounded-full animate-pulse"></div>
+            <div
+              className="w-12 h-12 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-surface-container-high p-0.5 shadow-lg shadow-secondary animate-pulse-glow">
+              <span className="text-2xl md:text-3xl font-manrope font-black text-secondary tracking-tighter">
                 {clone.nombre.charAt(0)}
               </span>
             </div>
           </div>
-          <h2 className="font-bold text-lg text-on-surface">{clone.nombre}</h2>
+
+          <h2 className="font-bold text-lg text-on-surface mt-4">{clone.nombre}</h2>
           <p className="text-sm text-muted-foreground">
             {clone.edad} años • {clone.genero}
           </p>
-        </div>
 
-        <div className="glass-panel border border-white/10 p-4 rounded-xl space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Ticket promedio</span>
-            <span className="text-sm font-semibold text-secondary-fixed-dim">
-              ${clone.ticketPromedio.toLocaleString()}
-            </span>
+          <div className="w-full space-y-3 mt-6">
+            <div className="glass-panel border p-3 rounded-xl">
+              <p className="text-md text-muted-foreground">Ticket promedio</p>
+              <p className="text-md lg:text-lg font-semibold text-secondary">
+                ${clone.ticketPromedio.toLocaleString()}
+              </p>
+            </div>
+            <div className="glass-panel border p-3 rounded-xl">
+              <p className="text-md text-muted-foreground">Compras/mes</p>
+              <p className="text-md lg:text-lg font-semibold text-on-surface">
+                {clone.comprasPorMes}
+              </p>
+            </div>
+            <div className="glass-panel border p-3 rounded-xl">
+              <p className="text-md text-muted-foreground">Descuentos</p>
+              <p className="text-md lg:text-lg font-semibold text-tertiary">
+                {clone.sensibleDescuentos ? "Sensible" : "Indiferente"}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Descuentos</span>
-            <span className={`text-sm font-semibold ${clone.sensibleDescuentos ? "text-tertiary" : "text-muted-foreground"}`}>
-              {clone.sensibleDescuentos ? "Sensible" : "Indiferente"}
-            </span>
-          </div>
-        </div>
 
-        <div className="mt-auto pt-4">
-          <p className="text-xs text-muted-foreground text-center">
-            Motor de simulación • Groq
+          <p className="text-xs text-muted-foreground mt-auto pt-4">
+            Simulación de IA • Groq
           </p>
         </div>
-      </div>
+      </section>
 
-      {/* Main Area */}
-      <div className="flex-1 flex flex-col h-full bg-surface">
-        {/* Header */}
+      <section className="flex-1 glass-panel ghost-border flex flex-col rounded-xl overflow-hidden h-full">
         <div className="p-6 pb-4 border-b border-white/5 shrink-0 bg-surface/50 backdrop-blur-sm">
           <h1 className="font-manrope font-bold text-xl text-on-surface flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-tertiary" />
             Simulador de Escenarios
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-md text-muted-foreground mt-1">
             Probá cómo reaccionaría {clone.nombre.split(" ")[0]} ante diferentes situaciones
           </p>
         </div>
 
         {/* Historial - scrollable */}
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-3xl mx-auto space-y-4">
-            <h3 className="font-semibold text-on-surface">
-              Historial ({historial.length})
-            </h3>
+          <h3 className="font-semibold text-on-surface">
+            Historial ({historial.length})
+          </h3>
 
+          <div className="overflow-y-auto p-3 space-y-4 scroll-auto h-[520px]">
             {historial.length === 0 ? (
               <div className="glass-panel border border-white/10 p-8 rounded-xl text-center">
                 <Sparkles className="w-10 h-10 mx-auto mb-3 text-muted-foreground opacity-50" />
@@ -151,45 +153,43 @@ export function SimulatorView({ clone, onBack }: SimulatorViewProps) {
 
         {/* Input Section - always visible at bottom */}
         <div className="p-6 pt-3 bg-surface/80 backdrop-blur-xl border-t border-white/5">
-          <div className="max-w-3xl mx-auto">
-            <Textarea
-              value={escenario}
-              onChange={(e) => setEscenario(e.target.value)}
-              placeholder="Ej: ¿Qué pasaría si suben los precios un 20%?"
-              rows={2}
-              disabled={loading}
-              className="bg-surface-container-low border-white/10 focus:border-tertiary resize-none"
-            />
+          <Textarea
+            value={escenario}
+            onChange={(e) => setEscenario(e.target.value)}
+            placeholder="Ej: ¿Qué pasaría si suben los precios un 20%?"
+            rows={2}
+            disabled={loading}
+            className="bg-surface-container-low border-white/10 focus:border-tertiary resize-none"
+          />
 
-            {/* Quick Suggestions */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {sugerencias.map((s) => (
-                <Button
-                  key={s.text}
-                  onClick={() => setEscenario(s.text)}
-                  disabled={loading}
-                  variant="outline"
-                  size="sm"
-                  className="border-white/20 hover:bg-white/10"
-                >
-                  <s.icon className="w-3 h-3 mr-2" />
-                  {s.text}
-                </Button>
-              ))}
-            </div>
-
-            <Button
-              onClick={() => simular(escenario)}
-              disabled={loading || !escenario.trim()}
-              className="mt-3 bg-gradient-to-r from-tertiary to-tertiary-container hover:opacity-90"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {loading ? "Simulando..." : "Simular Escenario"}
-            </Button>
+          {/* Quick Suggestions */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            {sugerencias.map((s) => (
+              <Button
+                key={s.text}
+                onClick={() => setEscenario(s.text)}
+                disabled={loading}
+                variant="outline"
+                size="sm"
+                className="border-white/20 hover:bg-white/10 cursor-pointer"
+              >
+                <s.icon className="w-3 h-3" />
+                {s.text}
+              </Button>
+            ))}
           </div>
+
+          <Button
+            onClick={() => simular(escenario)}
+            disabled={loading || !escenario.trim()}
+            className="mt-3 bg-linear-to-r from-tertiary to-tertiary-container hover:opacity-90 h-10 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            {loading ? "Simulando..." : "Simular Escenario"}
+          </Button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 

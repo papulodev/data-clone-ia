@@ -5,7 +5,6 @@ import { Clone, listarClones } from "@/lib/api";
 import { SimulatorView } from "@/components/SimulatorView";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import BackgroundNebula from "@/components/BackgroundNebula";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -16,7 +15,6 @@ interface PageProps {
 export default function SimulatePage({ params }: PageProps) {
   const [clone, setClone] = useState<Clone | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchClone = async () => {
@@ -63,7 +61,7 @@ export default function SimulatePage({ params }: PageProps) {
     <SidebarInset className="overflow-hidden bg-surface text-on-surface selection:bg-primary/30">
       <BackgroundNebula />
       <SidebarTrigger size="icon-lg" />
-      <SimulatorView clone={clone} onBack={() => router.push(`/clones/${clone._id}`)} />
+      <SimulatorView clone={clone} />
     </SidebarInset>
   );
 }
