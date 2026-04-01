@@ -27,7 +27,6 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <SidebarProvider>
         <DashboardContent>{children}</DashboardContent>
-        <Toaster />
       </SidebarProvider>
     </SessionProvider>
   );
