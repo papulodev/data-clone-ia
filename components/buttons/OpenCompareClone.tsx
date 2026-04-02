@@ -11,7 +11,7 @@ function OpenCompareClone({ clones }: { clones: Clone[] }) {
         <Scale />
         <span className='text-md font-manrope'>Comparar Clones</span>
       </DialogTrigger>
-      <DialogContent className='min-w-3xl bg-surface/80 backdrop-blur-xl border border-surface-tint/20 shadow-2xl shadow-purple-500/10'>
+      <DialogContent className='min-w-3xl bg-surface/80 backdrop-blur-xl border border-surface-tint/20 shadow-2xl shadow-purple-500/10 max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle>Comparar Clones</DialogTitle>
           <DialogDescription>
