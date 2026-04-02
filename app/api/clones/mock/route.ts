@@ -2,6 +2,7 @@ import { connectDB } from "@/app/lib/db"
 import { Clone } from "@/lib/models/Clone"
 import { generarEmbedding, generarResumenPersonalidad } from "@/lib/services/embedding"
 import { NextResponse } from "next/server"
+import { auth } from "@/auth"
 
 export const clientesMock = [
   {
@@ -38,6 +39,11 @@ export const clientesMock = [
 
 export async function POST() {
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ ok: false, error: 'No autorizado' }, { status: 401 })
+    }
+
     await connectDB()
     const clones = []
 
@@ -46,6 +52,7 @@ export async function POST() {
       const embedding = await generarEmbedding(datos)
       const clon = await Clone.create({
         ...datos,
+        userId: session.user.id,
         resumenPersonalidad,
         embedding
       })

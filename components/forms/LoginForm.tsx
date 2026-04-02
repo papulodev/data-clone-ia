@@ -42,6 +42,7 @@ function LoginForm() {
       const result = await signIn("credentials", {
         ...sanitizedData,
         redirect: false,
+        callbackUrl: "/dashboard",
       })
 
       if (result?.error) {

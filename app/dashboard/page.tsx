@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import { crearClonesMock } from "@/lib/api";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import BackgroundNebula from "@/components/BackgroundNebula";
 import Loading from "./loading";
 import { useCloneStore } from "@/store/useCloneStore";
 

@@ -2,12 +2,18 @@ import { connectDB } from "@/app/lib/db"
 import { Clone } from "@/lib/models/Clone"
 import { generarEmbedding, generarResumenPersonalidad } from "@/lib/services/embedding"
 import { NextResponse } from "next/server"
+import { auth } from "@/auth"
 import { crearClonSchema, sanitizarDatosClon, validarInput } from "@/lib/schemas/validation"
 
 export async function GET() {
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ ok: false, error: 'No autorizado' }, { status: 401 })
+    }
+
     await connectDB()
-    const clones = await Clone.find({ activo: true }).select('-embedding').sort({ creadoEn: -1 })
+    const clones = await Clone.find({ activo: true, userId: session.user.id }).select('-embedding').sort({ creadoEn: -1 })
 
     return NextResponse.json({ ok: true, total: clones.length, clones })
   } catch (error) {
@@ -20,6 +26,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ ok: false, error: 'No autorizado' }, { status: 401 })
+    }
+
     await connectDB()
     const datos = await request.json()
 
@@ -40,6 +51,7 @@ export async function POST(request: Request) {
 
     const clon = await Clone.create({
       ...datosSanitizados,
+      userId: session.user.id,
       resumenPersonalidad,
       embedding
     })

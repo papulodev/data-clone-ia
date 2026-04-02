@@ -21,6 +21,7 @@ const cloneSchema = new Schema({
   resumenPersonalidad: { type: String },
 
   // Metadata
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   creadoEn: { type: Date, default: Date.now },
   activo: { type: Boolean, default: true }
 })

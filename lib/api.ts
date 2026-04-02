@@ -25,7 +25,10 @@ export async function crearClon(datos: Omit<Clone, '_id' | 'resumenPersonalidad'
   return res.json()
 }
 export async function crearClonesMock(): Promise<{ ok: boolean; clones: { id: string; nombre: string }[] }> {
-  const res = await fetch('/api/clones/mock', { method: 'POST' })
+  const res = await fetch('/api/clones/mock', { 
+    method: 'POST',
+    credentials: 'include'
+  })
   return res.json()
 }
 export async function chatear(id: string, mensaje: string): Promise<{ ok: boolean; respuesta: string }> {

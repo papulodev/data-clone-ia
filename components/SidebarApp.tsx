@@ -24,8 +24,7 @@ export function SidebarApp() {
   const currentCloneId = pathname.startsWith('/clones/') ? pathname.split('/')[2] : null;
 
   const handleLogout = async () => {
-    const response = await signOut();
-    console.log(response);
+    await signOut();
     router.push('/login');
   }
 
