@@ -1,18 +1,14 @@
-import { NextResponse } from 'next/server'
-import { connectDB } from '@/app/lib/db'
-import { Clone } from '@/lib/models/Clone'
-import { simularEscenario } from '@/lib/services/groq'
-import { simularEscenarioSchema, sanitizarEscenario, validarInput } from '@/lib/schemas/validation'
-import mongoose from 'mongoose'
+import { Clone } from "@/lib/models/Clone"
+import { sanitizarEscenario, simularEscenarioSchema, validarInput } from "@/lib/schemas/validation"
+import { simularEscenario } from "@/lib/services/simulate"
+import mongoose from "mongoose"
+import { NextResponse } from "next/server"
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// POST /simulate/:clonId — simula un escenario para un clon
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await connectDB()
-    const body = await request.json()
     const { id } = await params
+    const { escenario } = await req.json()
 
     // Validar que el ID sea un ObjectId válido
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -23,7 +19,7 @@ export async function POST(
     }
 
     // Validar el escenario con Zod
-    const validacion = validarInput(simularEscenarioSchema, { escenario: body.escenario })
+    const validacion = validarInput(simularEscenarioSchema, { escenario })
     if (!validacion.success) {
       return NextResponse.json(
         { ok: false, error: validacion.error },
@@ -33,6 +29,9 @@ export async function POST(
 
     // Sanitizar el escenario antes de enviar
     const escenarioSanitizado = sanitizarEscenario(validacion.data!).escenario
+
+    if (!escenario)
+      return NextResponse.json({ ok: false, error: 'Enviá un escenario para simular' }, { status: 400 })
 
     const clon = await Clone.findById(id)
 
@@ -55,15 +54,15 @@ export async function POST(
 
     return NextResponse.json({
       ok: true,
-      clon: { id: clon._id, nombre: clon.nombre },
-      escenario: escenarioSanitizado,
-      resultado
+      clon: {
+        id: clon._id,
+        nombre: clon.nombre
+      },
+      simulacion: resultado
     })
+
   } catch (error) {
-    console.error("Error en simulación:", error)
-    return NextResponse.json(
-      { ok: false, error: (error as Error).message },
-      { status: 500 }
-    )
+    console.error('Error simulando escenario:', error)
+    return NextResponse.json({ ok: false, error: (error as Error).message }, { status: 500 })
   }
 }

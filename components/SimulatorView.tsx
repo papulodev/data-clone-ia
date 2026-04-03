@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from "react";
-import { Clone, simular as simularApi } from "@/lib/api";
+import { Clone, simularEscenario } from "@/lib/api";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Sparkles, TrendingUp, Percent, ShoppingCart, Truck, Gift } from "lucide-react";
+import { ArrowLeft, Sparkles, TrendingUp, Percent, ShoppingCart, Truck, Gift, TrendingDown, CircleChevronRight, Lightbulb } from "lucide-react";
 import Link from "next/link";
+import SimulationResultCard from "./SimulationResultCard";
 
 interface SimulatorViewProps {
   clone: Clone;
@@ -13,9 +14,21 @@ interface SimulatorViewProps {
 
 interface SimulationResult {
   escenario: string;
-  resultado: string;
-  confianza: "alta" | "media" | "baja";
-  timestamp: Date;
+  simulacion: {
+    escenario: string,
+    score: {
+      valor: number,
+      nivel: string,
+      color: string,
+      scoreBase: number,
+      ajuste: number
+    },
+    comportamientoEsperado: string[],
+    razonamiento: string,
+    recomendacion: string
+  },
+  confianza: "alta" | "media" | "baja",
+  timestamp: Date,
 }
 
 export function SimulatorView({ clone }: SimulatorViewProps) {
@@ -37,7 +50,7 @@ export function SimulatorView({ clone }: SimulatorViewProps) {
     setLoading(true);
 
     try {
-      const res = await simularApi(clone._id, texto);
+      const res = await simularEscenario(clone._id, texto);
       if (res.ok) {
         const confianzas: ("alta" | "media" | "baja")[] = ["alta", "media", "alta", "alta"];
         const confianza = confianzas[Math.floor(Math.random() * confianzas.length)];
@@ -45,7 +58,7 @@ export function SimulatorView({ clone }: SimulatorViewProps) {
         setHistorial((prev) => [
           {
             escenario: texto,
-            resultado: res.resultado,
+            simulacion: res.simulacion,
             confianza,
             timestamp: new Date(),
           },
@@ -190,67 +203,5 @@ export function SimulatorView({ clone }: SimulatorViewProps) {
         </div>
       </section>
     </main>
-  );
-}
-
-function SimulationResultCard({ simulation }: { simulation: SimulationResult }) {
-  const confianzaColor = {
-    alta: "#68dbae",
-    media: "#ffb95d",
-    baja: "#ffb4ab",
-  };
-
-  const confianzaLabel = {
-    alta: "Alta confianza",
-    media: "Confianza media",
-    baja: "Baja confianza",
-  };
-
-  return (
-    <div className="glass-panel border border-white/10 rounded-2xl p-5">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <p className="font-medium text-on-surface">{simulation.escenario}</p>
-          <p className="text-xs mt-1 text-muted-foreground">
-            {simulation.timestamp.toLocaleTimeString()}
-          </p>
-        </div>
-        <div
-          className="px-3 py-1 rounded-full text-xs font-semibold"
-          style={{
-            backgroundColor: `${confianzaColor[simulation.confianza]}20`,
-            color: confianzaColor[simulation.confianza],
-          }}
-        >
-          {confianzaLabel[simulation.confianza]}
-        </div>
-      </div>
-
-      {/* Confidence Bar */}
-      <div className="mb-3">
-        <div className="h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full"
-            style={{
-              width: `${simulation.confianza === "alta"
-                ? 85
-                : simulation.confianza === "media"
-                  ? 60
-                  : 35
-                }%`,
-              backgroundColor: confianzaColor[simulation.confianza],
-              boxShadow: `0 0 8px ${confianzaColor[simulation.confianza]}`,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Result */}
-      <div className="bg-surface-container-high rounded-lg p-3">
-        <p className="text-on-surface-variant text-sm whitespace-pre-wrap leading-relaxed">
-          {simulation.resultado}
-        </p>
-      </div>
-    </div>
   );
 }

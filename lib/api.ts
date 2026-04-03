@@ -45,8 +45,23 @@ export async function chatear(id: string, mensaje: string): Promise<{ ok: boolea
   })
   return res.json()
 }
-export async function simular(id: string, escenario: string): Promise<{ ok: boolean; resultado: string }> {
-  const res = await fetch(`/api/chat/${id}/simular`, {
+
+type SimulationResult = {
+  escenario: string,
+  score: {
+    valor: number,
+    nivel: string,
+    color: string,
+    scoreBase: number,
+    ajuste: number
+  },
+  comportamientoEsperado: string[],
+  razonamiento: string,
+  recomendacion: string
+}
+
+export async function simularEscenario(id: string, escenario: string): Promise<{ ok: boolean; simulacion: SimulationResult }> {
+  const res = await fetch(`/api/simulate/${id}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ escenario })
@@ -77,6 +92,24 @@ export async function compararClones(clonAId: string, clonBId: string): Promise<
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ clonAId, clonBId })
+  })
+  return res.json()
+}
+
+export async function simularBatch(clonIds: string[], escenario: string): Promise<{ ok: boolean; escenario: string; resultados: any[] }> {
+  const res = await fetch('/api/simulate/batch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clonIds, escenario })
+  })
+  return res.json()
+}
+
+export async function simularBatchIndividual(id: string, escenario: string): Promise<{ ok: boolean; escenario: string; resultados: any[] }> {
+  const res = await fetch(`/api/simulate/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ escenario })
   })
   return res.json()
 }
