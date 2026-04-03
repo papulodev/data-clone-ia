@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { Clone, listarClones } from "@/lib/api";
+import { Clone, obtenerClon } from "@/lib/api";
 import { ChatView } from "@/components/ChatView";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import BackgroundNebula from "@/components/BackgroundNebula";
@@ -19,10 +19,9 @@ export default function ChatPage({ params }: PageProps) {
   useEffect(() => {
     const fetchClone = async () => {
       const resolvedParams = await params;
-      const res = await listarClones();
+      const res = await obtenerClon(resolvedParams.id);
       if (res.ok) {
-        const foundClone = res.clones.find((c: Clone) => c._id === resolvedParams.id);
-        setClone(foundClone || null);
+        setClone(res.clon || null);
       }
       setLoading(false);
     };
