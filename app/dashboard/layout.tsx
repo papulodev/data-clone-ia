@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { SidebarApp } from '@/components/SidebarApp';
-import { Toaster } from '@/components/ui/sonner';
 import { useCloneStore } from '@/store/useCloneStore';
 import { SessionProvider } from 'next-auth/react';
 

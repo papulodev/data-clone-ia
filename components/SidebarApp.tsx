@@ -8,12 +8,10 @@ import { Button } from "./ui/button";
 import { signOut, useSession } from "next-auth/react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 import OpenCreateClone from "./buttons/OpenCreateClone";
-import OpenCompareClone from "./buttons/OpenCompareClone";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import clsx from "clsx";
 import { useCloneStore } from "@/store/useCloneStore";
-import { LogOut } from "lucide-react";
+import { LogOut, Scale } from "lucide-react";
 
 export function SidebarApp() {
   const pathname = usePathname();
@@ -31,15 +29,9 @@ export function SidebarApp() {
   return (
     <Sidebar className="bg-sidebar border-r border-white/5">
       <SidebarHeader className="p-4 bg-transparent">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/dashboard" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-linear-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-foreground">
-              <path d="M12 2c-4.4 0-8 2.5-8 7s3.6 7 8 7 8-2.5 8-7-3.6-7-8-7z" />
-              <path d="M12 22c4.4 0 8-2.5 8-7s-3.6-7-8-7" />
-              <circle cx="12" cy="9" r="2" />
-              <circle cx="8" cy="13" r="1.5" />
-              <circle cx="16" cy="13" r="1.5" />
-            </svg>
+            🧬
           </div>
           <div>
             <h1 className="font-manrope font-bold text-lg text-foreground">
@@ -56,8 +48,11 @@ export function SidebarApp() {
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <OpenCompareClone clones={clones} />
+                <SidebarMenuButton isActive={pathname === "/dashboard/clones/compare"} asChild className="bg-primary-container/10 hover:bg-primary-container/40 transition-colors cursor-pointer h-12 w-full rounded-md">
+                  <Link href="/dashboard/clones/compare" className='flex items-center gap-3 px-4 py-3 text-white/40 hover:text-white/80'>
+                    <Scale />
+                    <span className='text-md font-manrope'>Comparar Clones</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -81,8 +76,8 @@ export function SidebarApp() {
                 const isSelected = currentCloneId === clone._id;
                 return (
                   <SidebarMenuItem key={clone._id}>
-                    <SidebarMenuButton asChild>
-                      <Link href={`/dashboard/clones/${clone._id}`} className={clsx("h-auto bg-primary/10 hover:bg-primary/60 cursor-pointer transition-colors duration-300 rounded-md", { isSelected: "bg-primary/40 text-primary transition-colors" })}>
+                    <SidebarMenuButton isActive={isSelected} className="bg-primary/10 hover:bg-primary-container/20 h-auto cursor-pointer transition-colors duration-300 rounded-md" asChild>
+                      <Link href={`/dashboard/clones/${clone._id}`}>
                         <CloneListItem clone={clone} selected={isSelected} />
                       </Link>
                     </SidebarMenuButton>

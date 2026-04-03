@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Button } from '../ui/button'
-import { CreateCloneForm } from '../CreateCloneForm'
+import { CreateCloneForm } from '../forms/CreateCloneForm'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
 
 function OpenCreateClone() {

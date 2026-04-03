@@ -16,6 +16,12 @@ export async function listarClones(): Promise<{ ok: boolean; clones: Clone[]; to
   const res = await fetch('/api/clones')
   return res.json()
 }
+
+export async function obtenerClon(id: string): Promise<{ ok: boolean; clon: Clone }> {
+  const res = await fetch(`/api/clones/${id}`)
+  return res.json()
+}
+
 export async function crearClon(datos: Omit<Clone, '_id' | 'resumenPersonalidad' | 'activo' | 'creadoEn'>): Promise<{ ok: boolean; clon: Clone }> {
   const res = await fetch('/api/clones', {
     method: 'POST',
@@ -25,7 +31,7 @@ export async function crearClon(datos: Omit<Clone, '_id' | 'resumenPersonalidad'
   return res.json()
 }
 export async function crearClonesMock(): Promise<{ ok: boolean; clones: { id: string; nombre: string }[] }> {
-  const res = await fetch('/api/clones/mock', { 
+  const res = await fetch('/api/clones/mock', {
     method: 'POST',
     credentials: 'include'
   })
