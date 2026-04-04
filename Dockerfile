@@ -11,7 +11,8 @@ RUN npm install
 
 # Copy source
 COPY . .
-
+ARG MONGODB_URI
+ENV MONGODB_URI=$MONGODB_URI
 # Build Next.js app
 RUN npm run build
 
