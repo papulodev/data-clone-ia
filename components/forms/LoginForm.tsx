@@ -1,11 +1,12 @@
 'use client';
+
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { loginSchema } from "@/lib/schemas/auth"
 import { createZodResolver } from "@/lib/schemas/zod-resolver"
 import { sanitizeEmail, sanitizeString } from "@/lib/schemas/sanitization"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "../ui/field";
@@ -21,6 +22,7 @@ const loginResolver = createZodResolver(loginSchema)
 
 function LoginForm() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<LoginFormData>({
