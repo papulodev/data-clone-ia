@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Clone, chatear } from "@/lib/api";
+import { Clone, chatear, obtenerHistorial, borrarHistorial } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Send, MessageCircle, Bot, User } from "lucide-react";
-import { Input } from "./ui/input";
+import { ArrowLeft, Send, MessageCircle, Bot, User, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Field, FieldDescription } from "./ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { toast } from "sonner";
 
 // Schema de validación para el mensaje
 const messageSchema = z.object({
@@ -28,15 +29,34 @@ interface Message {
 }
 
 export function ChatView({ clone }: ChatViewProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "ia",
-      content: `¡Hola! Soy ${clone.nombre}. ¿Querés preguntarme algo sobre mis preferencias como cliente?`,
-    },
-  ]);
   const [loading, setLoading] = useState(false);
   const [inputError, setInputError] = useState<string>("");
+  const [historialCargado, setHistorialCargado] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Mensaje de bienvenida inicial
+  const mensajeBienvenida: Message = {
+    role: "ia",
+    content: `¡Hola! Soy ${clone.nombre}. ¿Querés preguntarme algo sobre mis preferencias como cliente?`,
+  };
+
+  const [messages, setMessages] = useState<Message[]>([mensajeBienvenida]);
+
+  useEffect(() => {
+    const cargarHistorial = async () => {
+      const res = await obtenerHistorial(clone._id)
+      if (res.ok && res.mensajes && res.mensajes.length > 0) {
+        const msgs: Message[] = res.mensajes.map((m: any) => ({
+          role: (m.role === 'user' ? 'user' : 'ia') as "user" | "ia",
+          content: m.content
+        }))
+        // Reemplazar todo el estado con el historial + mensaje de bienvenida
+        setMessages([...msgs, mensajeBienvenida])
+      }
+      setHistorialCargado(true)
+    }
+    cargarHistorial()
+  }, [clone._id])
 
   const {
     register,
@@ -73,6 +93,7 @@ export function ChatView({ clone }: ChatViewProps) {
 
     try {
       const res = await chatear(clone._id, userMessage);
+      console.log("Respuesta:", res);
       if (res.ok) {
         setMessages((prev) => [...prev, { role: "ia", content: res.respuesta }]);
       } else {
@@ -92,10 +113,10 @@ export function ChatView({ clone }: ChatViewProps) {
   };
 
   const quickQuestions = [
-    "¿Me comprarías este producto?",
-    "¿Te parece caro?",
-    "¿Qué mejorarías?",
-    "¿Esperarías una oferta?",
+    "¿Qué te haría decidir comprar algo hoy?",
+    "¿Cómo evaluás si algo vale lo que cuesta?",
+    "¿Por dónde preferís comprar: online o en tienda?",
+    "¿Qué te haría abandonar una compra?",
   ];
 
   const sendQuickQuestion = (question: string) => {
@@ -115,6 +136,20 @@ export function ChatView({ clone }: ChatViewProps) {
       }
       setLoading(false);
     });
+  };
+
+  const handleBorrarHistorial = async () => {
+    if (!confirm("¿Querés borrar todo el historial de chat?")) return;
+    const res = await borrarHistorial(clone._id);
+    if (res.ok) {
+      toast.success("Historial borrado correctamente");
+      setMessages([
+        {
+          role: "ia",
+          content: `¡Hola! Soy ${clone.nombre}. ¿Querés preguntarme algo sobre mis preferencias como cliente?`,
+        },
+      ]);
+    }
   };
 
   return (
@@ -177,14 +212,30 @@ export function ChatView({ clone }: ChatViewProps) {
       {/* Chat Area */}
       <section className="flex-1 glass-panel ghost-border flex flex-col rounded-xl overflow-hidden h-full">
         {/* Header */}
-        <div className="p-6 pb-4 border-b border-white/5 shrink-0 bg-surface/50 backdrop-blur-sm">
-          <h1 className="font-manrope font-bold text-xl text-on-surface flex items-center gap-3">
-            <MessageCircle className="w-5 h-5 text-tertiary" />
-            Chat con {clone.nombre.split(" ")[0]}
-          </h1>
-          <p className="text-md text-muted-foreground mt-1">
-            Conversá con el clon como si fuera un cliente real
-          </p>
+        <div className="p-6 pb-4 border-b border-white/5 shrink-0 bg-surface/50 backdrop-blur-sm flex justify-between items-start">
+          <div>
+            <h1 className="font-manrope font-bold text-xl text-on-surface flex items-center gap-3">
+              <MessageCircle className="w-5 h-5 text-tertiary" />
+              Chat con {clone.nombre.split(" ")[0]}
+            </h1>
+            <p className="text-md text-muted-foreground mt-1">
+              Conversá con el clon como si fuera un cliente real
+            </p>
+          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                onClick={handleBorrarHistorial}
+                className="bg-red-500 text-white hover:bg-red-600 p-2 cursor-pointer rounded-lg"
+              >
+                <Trash2 className="w-5 h-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Borrar historial</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Messages - grow and scroll */}

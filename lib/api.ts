@@ -41,7 +41,20 @@ export async function chatear(id: string, mensaje: string): Promise<{ ok: boolea
   const res = await fetch(`/api/chat/${id}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mensaje })
+    body: JSON.stringify({ pregunta: mensaje })
+  })
+  return res.json()
+}
+
+export async function obtenerHistorial(id: string, conversacionId?: string): Promise<{ ok: boolean; mensajes?: any[]; conversacionId?: string; error?: string }> {
+  const params = conversacionId ? `?conversacionId=${conversacionId}` : ''
+  const res = await fetch(`/api/chat/${id}/historial${params}`)
+  return res.json()
+}
+
+export async function borrarHistorial(id: string): Promise<{ ok: boolean; message: string }> {
+  const res = await fetch(`/api/chat/${id}/historial`, {
+    method: 'DELETE'
   })
   return res.json()
 }
