@@ -2,11 +2,12 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        - MONGODB_URI=mongodb://mongo:27017/dataclone
     env_file:
       - .env.production
-    args:
-      - MONGODB_URI=mongodb://mongo:27017/dataclone
     ports:
       - '3000:3000'
     environment:
