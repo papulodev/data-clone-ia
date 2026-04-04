@@ -15,7 +15,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       : { clonId: id }
 
     const conversacion = await Conversation.findOne(query).sort({ creadoEn: -1 })
-    console.log(conversacion)
 
     if (!conversacion)
       return NextResponse.json({ ok: true, mensajes: [], conversacionId: null })

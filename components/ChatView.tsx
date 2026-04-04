@@ -32,6 +32,7 @@ export function ChatView({ clone }: ChatViewProps) {
   const [loading, setLoading] = useState(false);
   const [inputError, setInputError] = useState<string>("");
   const [historialCargado, setHistorialCargado] = useState(false);
+  const [conversacionId, setConversacionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Mensaje de bienvenida inicial
@@ -52,6 +53,10 @@ export function ChatView({ clone }: ChatViewProps) {
         }))
         // Reemplazar todo el estado con el historial + mensaje de bienvenida
         setMessages([...msgs, mensajeBienvenida])
+        // Guardar el conversacionId si viene
+        if (res.conversacionId) {
+          setConversacionId(res.conversacionId)
+        }
       }
       setHistorialCargado(true)
     }
@@ -92,10 +97,14 @@ export function ChatView({ clone }: ChatViewProps) {
     setLoading(true);
 
     try {
-      const res = await chatear(clone._id, userMessage);
+      const res = await chatear(clone._id, userMessage, conversacionId || undefined);
       console.log("Respuesta:", res);
       if (res.ok) {
         setMessages((prev) => [...prev, { role: "ia", content: res.respuesta }]);
+        // Guardar el conversacionId si viene en la respuesta
+        if (res.conversacionId && !conversacionId) {
+          setConversacionId(res.conversacionId)
+        }
       } else {
         setMessages((prev) => [
           ...prev,
@@ -125,9 +134,12 @@ export function ChatView({ clone }: ChatViewProps) {
     setMessages((prev) => [...prev, { role: "user", content: question }]);
     setLoading(true);
 
-    chatear(clone._id, question).then((res) => {
+    chatear(clone._id, question, conversacionId || undefined).then((res) => {
       if (res.ok) {
         setMessages((prev) => [...prev, { role: "ia", content: res.respuesta }]);
+        if (res.conversacionId && !conversacionId) {
+          setConversacionId(res.conversacionId)
+        }
       } else {
         setMessages((prev) => [
           ...prev,

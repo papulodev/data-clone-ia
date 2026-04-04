@@ -62,6 +62,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (conversacionId) {
       conversacion = await Conversation.findById(conversacionId)
     }
+    
+    // Si no hay conversación, buscar la última del clon o crear una nueva
+    if (!conversacion) {
+      conversacion = await Conversation.findOne({ clonId: id }).sort({ actualizadoEn: -1 })
+    }
+    
+    // Si todavía no existe, crear una nueva
     if (!conversacion) {
       conversacion = await Conversation.create({ clonId: id, mensajes: [] })
     }

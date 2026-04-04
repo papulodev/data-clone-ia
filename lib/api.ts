@@ -37,11 +37,11 @@ export async function crearClonesMock(): Promise<{ ok: boolean; clones: { id: st
   })
   return res.json()
 }
-export async function chatear(id: string, mensaje: string): Promise<{ ok: boolean; respuesta: string }> {
+export async function chatear(id: string, mensaje: string, conversacionId?: string): Promise<{ ok: boolean; respuesta: string; conversacionId?: string }> {
   const res = await fetch(`/api/chat/${id}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ pregunta: mensaje })
+    body: JSON.stringify({ pregunta: mensaje, conversacionId })
   })
   return res.json()
 }
