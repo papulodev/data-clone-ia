@@ -49,7 +49,7 @@ function CompareClonesResult({ comparacion }: { comparacion: Comparacion | null 
             <div className="flex flex-col items-center py-8">
               <div
                 className="h-64 w-4 bg-surface-container-high rounded-full relative overflow-hidden flex flex-col justify-end">
-                <div className={`h-[${comparacion.similitud.porcentaje}%] ${clsx("w-full", {
+                <div style={{ height: `${comparacion.similitud.porcentaje}%` }} className={`w-full ${clsx("w-full", {
                   "bg-tertiary": comparacion.similitud.porcentaje > 70,
                   "bg-secondary": comparacion.similitud.porcentaje > 40 && comparacion.similitud.porcentaje <= 70,
                   "bg-primary": comparacion.similitud.porcentaje <= 40,

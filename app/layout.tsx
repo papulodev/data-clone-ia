@@ -29,13 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" data-theme="dark" style={{ colorScheme: "dark" }}>
       <body
         className={`${manrope.variable} ${inter.variable} h-full antialiased`}
       >
         <SessionProvider>
           <TooltipProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <ThemeProvider>
               {children}
             </ThemeProvider>
           </TooltipProvider>
