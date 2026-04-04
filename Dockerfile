@@ -9,10 +9,11 @@ COPY package.json package-lock.json* ./
 # Install dependencies
 RUN npm install
 
-# Copy source
-COPY . .
 ARG MONGODB_URI
 ENV MONGODB_URI=$MONGODB_URI
+
+# Copy source
+COPY . .
 # Build Next.js app
 RUN npm run build
 
