@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
+import { SessionProvider } from "next-auth/react";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -32,11 +33,13 @@ export default function RootLayout({
       <body
         className={`${manrope.variable} ${inter.variable} h-full antialiased`}
       >
-        <TooltipProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            {children}
-          </ThemeProvider>
-        </TooltipProvider>
+        <SessionProvider>
+          <TooltipProvider>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+              {children}
+            </ThemeProvider>
+          </TooltipProvider>
+        </SessionProvider>
         <Toaster />
       </body>
     </html>
