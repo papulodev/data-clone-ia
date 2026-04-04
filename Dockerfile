@@ -34,6 +34,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/lib ./lib
 
+# Fix permissions
+RUN chown -R nextjs:nodejs /app
+
 # Set environment
 ENV NODE_ENV=production
 ENV PATH=/app/node_modules/.bin:$PATH
