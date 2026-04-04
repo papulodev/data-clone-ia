@@ -5,13 +5,13 @@ services:
     build:
       context: .
       args:
-        - MONGODB_URI=mongodb://mongo:27017/dataclone
+        MONGODB_URI: mongodb://mongo:27017/dataclone
     env_file:
       - .env.production
     ports:
       - '3000:3000'
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/dataclone
+      - NODE_ENV=production
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
     depends_on:
