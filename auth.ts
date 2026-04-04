@@ -5,6 +5,7 @@ import { connectDB } from "./app/lib/db"
 import Credentials from "next-auth/providers/credentials"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   callbacks: {
     authorized: async ({ auth }) => {
       return !!auth
@@ -37,12 +38,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // Conectar a MongoDB antes de hacer queries
         await connectDB()
 
-        console.log("Authorizing:", credentials.email)
-
         const user = await User.findOne({ email: credentials.email as string })
 
         if (!user) {
-          console.log("User not found:", credentials.email)
           return null
         }
 
@@ -50,8 +48,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           credentials.password as string,
           user.password
         )
-
-        console.log("Password valid:", isValid)
 
         if (!isValid) {
           return null
@@ -82,5 +78,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/login",
   },
-  useSecureCookies: process.env.NODE_ENV === "production",
+  trustHost: true,
 })
