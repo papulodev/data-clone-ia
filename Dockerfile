@@ -47,5 +47,5 @@ USER nextjs
 # Expose port
 EXPOSE 3000
 
-# Start
-CMD ["node", "node_modules/next/dist/bin/next"]
+# Start in production mode
+CMD ["next", "start"]
